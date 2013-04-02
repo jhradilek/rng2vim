@@ -25,6 +25,10 @@ use XML::LibXML;
 use constant NAME    => basename($0, '.pl');
 use constant VERSION => '0.1.0';
 
+# RELAX NG elements to be analyzed:
+use constant COMPOSITORS => qr/^(choice|div|grammar|group|interleave|list|mixed|oneOrMore|optional|zeroOrMore)$/;
+use constant REFERENCES  => qr/^(parentRef|ref)$/;
+
 # Reconfigure the __WARN__ signal handler:
 $SIG{__WARN__} = sub {
   print STDERR NAME . ": " . (shift);
@@ -93,6 +97,70 @@ sub find_definition {
 
   # Return the node:
   return $node;
+}
+
+# Return a hash containing allowed child elements or attributes.
+#
+# Usage: find_properties <document> <node> element|attribute
+sub find_properties {
+  # Get function arguments:
+  my $document = shift || die 'Invalid number of arguments';
+  my $parent   = shift || die 'Invalid number of arguments';
+  my $type     = shift || die 'Invalid number of arguments';
+
+  # Verify that the supplied type is supported:
+  die 'Invalid argument' unless ($type =~ /^(attribute|element)$/);
+
+  # Declare required variables:
+  my %result = ();
+
+  # Add child nodes to the queue:
+  my @queue  = $parent->childNodes;
+
+  # Process all nodes in the queue:
+  while (my $node = shift @queue) {
+    # Get the name of the currently processed node:
+    my $node_name = $node->nodeName;
+
+    # Check whether the node is of the required type:
+    if ($node_name eq $type) {
+      # Check if the node is an element:
+      if ($type eq 'element') {
+        # Get the name of the element:
+        if (my $element_name = $node->getAttribute('name')) {
+          # Add the element to the list of allowed children:
+          $result{$element_name} = '';
+        }
+      }
+      # Check if the node is an attribute:
+      elsif ($type eq 'attribute') {
+        # Get the name of the attribute:
+        if (my $attribute_name = $node->getAttribute('name')) {
+          # Add the attribute to the list:
+          $result{$attribute_name} = '';
+        }
+      }
+    }
+    # Check whether the node is a relevant compositor:
+    elsif ($node_name =~ COMPOSITORS) {
+      # Add child nodes to the queue:
+      push(@queue, $node->childNodes);
+    }
+    # Check whether the node is a reference:
+    elsif ($node_name =~ REFERENCES) {
+      # Get the name of the referenced name pattern:
+      my $reference_name = $node->getAttribute('name');
+
+      # Locate the definition of the referenced name pattern:
+      my $reference_target = find_definition($document, $reference_name);
+
+      # Add child nodes to the queue:
+      push(@queue, $reference_target->childNodes);
+    }
+  }
+
+  # Return the result:
+  return %result;
 }
 
 # Configure the option parser:
