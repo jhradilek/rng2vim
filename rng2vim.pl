@@ -216,6 +216,57 @@ sub get_children {
   return keys %temporary;
 }
 
+# Return a hash containing  all available elements, their allowed children,
+# supported attributes, and available attribute values.
+#
+# Usage: get_elements <document>
+sub get_elements {
+  # Get function arguments:
+  my $document = shift || die 'Invalid number of arguments';
+
+  # Declare required variables:
+  my %result = ();
+
+  # Find all element definitions:
+  foreach my $element ($document->findnodes("//*[name()='element' and \@name]")) {
+    # Get the name of the element:
+    my $name = $element->getAttribute('name');
+
+    # Get a list of supported child elements and attributes:
+    my @children   = get_children($document, $element);
+    my %attributes = get_attributes($document, $element);
+
+    # Check if there already is an element of the same name:
+    if (exists $result{$name}) {
+      # Get the original list of supported child elements and attributes:
+      my @element = @{$result{$name}};
+      my @original_children   = @{$element[0]};
+      my %original_attributes = %{$element[1]};
+
+      # Update the list of supported child elements:
+      @children = keys %{{ map { $_ => 1 } (@children, @original_children) }};
+
+      # Process all attributes:
+      while (my ($key, $values) = each %original_attributes) {
+        # Check if there already is an attribute of the same name:
+        if (exists $attributes{$key}) {
+          # Update the list of supported attribute values:
+          @$values = keys %{{ map { $_ => 1 } (@{$attributes{$key}}, @$values) }};
+        }
+
+        # Update the list of supported attributes:
+        $attributes{$key} = $values;
+      }
+    }
+
+    # Add the element definition to the list:
+    $result{$name} = [ \@children, \%attributes ];
+  }
+
+  # Return the result:
+  return %result;
+}
+
 # Configure the option parser:
 Getopt::Long::Configure('no_auto_abbrev', 'no_ignore_case', 'bundling');
 
