@@ -29,6 +29,34 @@ use constant VERSION => '0.1.0';
 use constant COMPOSITORS => qr/^(choice|div|grammar|group|interleave|list|mixed|oneOrMore|optional|zeroOrMore)$/;
 use constant REFERENCES  => qr/^(parentRef|ref)$/;
 
+# XML 1.1 character entity references:
+use constant XML_ENTITIES   => qw( lt gt amp apos quot );
+
+# HTML 4.01 and XHTML 1.0 character entity references:
+use constant XHMTL_ENTITIES => qw( aacute Aacute acirc Acirc acute aelig AElig
+agrave Agrave alefsym alpha Alpha amp and ang apos aring Aring asymp atilde
+Atilde auml Auml bdquo beta Beta brvbar bull cap ccedil Ccedil cedil cent
+chi Chi circ clubs cong copy crarr cup curren dagger Dagger darr dArr deg
+delta Delta diams divide eacute Eacute ecirc Ecirc egrave Egrave empty emsp
+ensp epsilon Epsilon equiv eta Eta eth ETH euml Euml euro exist fnof forall
+frac12 frac14 frac34 frasl gamma Gamma ge gt harr hArr hearts hellip iacute
+Iacute icirc Icirc iexcl igrave Igrave image infin int iota Iota iquest
+isin iuml Iuml kappa Kappa lambda Lambda lang laquo larr lArr lceil ldquo
+le lfloor lowast loz lrm lsaquo lsquo lt macr mdash micro middot minus mu
+Mu nabla nbsp ndash ne ni not notin nsub ntilde Ntilde nu Nu oacute Oacute
+ocirc Ocirc oelig OElig ograve Ograve oline omega Omega omicron Omicron
+oplus or ordf ordm oslash Oslash otilde Otilde otimes ouml Ouml para part
+permil perp phi Phi pi Pi piv plusmn pound prime Prime prod prop psi Psi
+quot radic rang raquo rarr rArr rceil rdquo real reg rfloor rho Rho rlm
+rsaquo rsquo sbquo scaron Scaron sdot sect shy sigma Sigma sigmaf sim
+spades sub sube sum sup sup1 sup2 sup3 supe szlig tau Tau there4 theta
+Theta thetasym thinsp thorn THORN tilde times trade uacute Uacute uarr uArr
+ucirc Ucirc ugrave Ugrave uml upsih upsilon Upsilon uuml Uuml weierp xi Xi
+yacute Yacute yen yuml Yuml zeta Zeta zwj zwnj );
+
+# Command line options:
+our $option_xhtml_entities = 0;
+
 # Reconfigure the __WARN__ signal handler:
 $SIG{__WARN__} = sub {
   print STDERR NAME . ": " . (shift);
@@ -302,6 +330,9 @@ sub rng_to_vim {
 
   # Print the XML data file start:
   print "\nlet g:xmldata_$name = {\n";
+
+  # Print the list of entity references:
+  print "\\ 'vimxmlentities': [", join(', ', map { "'$_'" } ($option_xhtml_entities) ? XHMTL_ENTITIES : XML_ENTITIES), "],\n";
 
   # Print the list of root elements:
   print "\\ 'vimxmlroot': [", join(', ', map { "'$_'" } sort @root ),"],\n";
