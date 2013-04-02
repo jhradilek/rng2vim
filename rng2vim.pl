@@ -267,6 +267,23 @@ sub get_elements {
   return %result;
 }
 
+# Return a list containing supported root elements.
+#
+# Usage: get_root_elements <document>
+sub get_root_elements {
+  # Get function arguments:
+  my $document = shift || die 'Invalid number of arguments';
+
+  # Find the node with root element definitions:
+  my ($node) = $document->findnodes("/*[name()='grammar']/*[name()='start']");
+
+  # Find supported root elements:
+  my @elements = get_children($document, $node);
+
+  # Return the result:
+  return @elements;
+}
+
 # Configure the option parser:
 Getopt::Long::Configure('no_auto_abbrev', 'no_ignore_case', 'bundling');
 
