@@ -97,10 +97,11 @@ sub display_usage {
 
   # Display usage information:
   print << "END_USAGE";
-Usage: $name FILE
+Usage: $name [OPTION...] SCHEMA NAME
 
-  -h, --help        display usage information and exit
-  -v, --version     display version information and exit
+  -x, --xhtml-entities     use XHTML 1.0 character entity references
+  -h, --help               display usage information and exit
+  -v, --version            display version information and exit
 END_USAGE
 }
 
@@ -359,12 +360,16 @@ Getopt::Long::Configure('no_auto_abbrev', 'no_ignore_case', 'bundling');
 
 # Process the command line options:
 GetOptions(
-  'help|h'    => sub { display_usage();   exit 0; },
-  'version|v' => sub { display_version(); exit 0; },
+  'help|h'           => sub { display_usage();   exit 0;  },
+  'version|v'        => sub { display_version(); exit 0;  },
+  'xhtml-entities|x' => sub { $option_xhtml_entities = 1; },
 );
 
 # Verify the number of command line arguments:
-display_error("Invalid number of arguments.", 22) if (scalar(@ARGV) == 0);
+display_error("Invalid number of arguments.", 22) if (scalar(@ARGV) != 2);
+
+# Convert a RELAX NG schema to an XML data file for Vim:
+rng_to_vim($ARGV[0], $ARGV[1]);
 
 # Terminate the script:
 exit 0;
