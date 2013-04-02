@@ -284,6 +284,45 @@ sub get_root_elements {
   return @elements;
 }
 
+# Convert a RELAX NG schema to an XML data file for Vim.
+#
+# Usage: rng_to_vim <schema> <name>
+sub rng_to_vim {
+  # Get function arguments:
+  my $schema = shift || die 'Invalid number of arguments';
+  my $name   = shift || die 'Invalid number of arguments';
+
+  # Parse the XML schema:
+  my $parser   = XML::LibXML->new(clean_namespaces => 1, no_defdtd => 1, expand_xinclude => 1);
+  my $document = $parser->parse_file($schema);
+
+  # Get a list of defined XML elements:
+  my %elements = get_elements($document);
+  my @root     = get_root_elements($document);
+
+  # Print the XML data file start:
+  print "\nlet g:xmldata_$name = {\n";
+
+  # Print the list of root elements:
+  print "\\ 'vimxmlroot': [", join(', ', map { "'$_'" } sort @root ),"],\n";
+
+  # Print element definitions:
+  while (my ($element, $property) = each %elements) {
+    # Get supported child elements and attributes:
+    my @children = @{$property->[0]};
+    my %attributes = %{$property->[1]};
+
+    # Print the element definition:
+    print "\\ '$element': [\n";
+    print "\\ [", join(', ', map { "'$_'" } sort @children), "],\n";
+    print "\\ {", join(', ', map { "'$_': [" . join(', ', map { "'$_'" } sort @{$attributes{$_}}) . "]" } sort keys %attributes), "}\n";
+    print "\\ ],\n";
+  }
+
+  # Print the XML data file end:
+  print "\\ }\n";
+}
+
 # Configure the option parser:
 Getopt::Long::Configure('no_auto_abbrev', 'no_ignore_case', 'bundling');
 
