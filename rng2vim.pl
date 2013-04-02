@@ -56,6 +56,10 @@ yacute Yacute yen yuml Yuml zeta Zeta zwj zwnj );
 
 # Command line options:
 our $option_xhtml_entities = 0;
+our $option_author         = '';
+our $option_language       = '';
+our $option_maintainer     = '';
+our $option_url            = '';
 
 # Reconfigure the __WARN__ signal handler:
 $SIG{__WARN__} = sub {
@@ -99,6 +103,10 @@ sub display_usage {
   print << "END_USAGE";
 Usage: $name [OPTION...] SCHEMA NAME
 
+  -a, --author NAME        specify the XML data file author
+  -l, --language LANGUAGE  specify the XML data file language
+  -m, --maintainer NAME    specify the XML data file maintainer
+  -u, --url URL            specify the XML data file URL
   -x, --xhtml-entities     use XHTML 1.0 character entity references
   -h, --help               display usage information and exit
   -v, --version            display version information and exit
@@ -313,6 +321,18 @@ sub get_root_elements {
   return @elements;
 }
 
+# Return a string with the date in the YYYY-MM-DD format.
+#
+# Usage: date_to_string [<unix_time>]
+sub date_to_string {
+  # Get function arguments:
+  my $unix_time = shift || time;
+
+  # Convert the Unix time entry to a human-readable format:
+  my @time = localtime($unix_time);
+  return sprintf("%d-%02d-%02d", ($time[5] + 1900), ++$time[4], $time[3]);
+}
+
 # Convert a RELAX NG schema to an XML data file for Vim.
 #
 # Usage: rng_to_vim <schema> <name>
@@ -328,6 +348,14 @@ sub rng_to_vim {
   # Get a list of defined XML elements:
   my %elements = get_elements($document);
   my @root     = get_root_elements($document);
+
+  # Print the XML data file header:
+  print "\" Vim XML data file\n";
+  print "\" Language:    $option_language\n"   if ($option_language);
+  print "\" Author:      $option_author\n"     if ($option_author);
+  print "\" Maintainer:  $option_maintainer\n" if ($option_maintainer);
+  print "\" URL:         $option_url\n"        if ($option_url);
+  print "\" Last Change: ", date_to_string(), "\n";
 
   # Print the XML data file start:
   print "\nlet g:xmldata_$name = {\n";
@@ -363,6 +391,10 @@ GetOptions(
   'help|h'           => sub { display_usage();   exit 0;  },
   'version|v'        => sub { display_version(); exit 0;  },
   'xhtml-entities|x' => sub { $option_xhtml_entities = 1; },
+  'author|a=s'       => sub { $option_author         = $_[1]; },
+  'language|l=s'     => sub { $option_language       = $_[1]; },
+  'maintainer|m=s'   => sub { $option_maintainer     = $_[1]; },
+  'url|u=s'          => sub { $option_url            = $_[1]; },
 );
 
 # Verify the number of command line arguments:
