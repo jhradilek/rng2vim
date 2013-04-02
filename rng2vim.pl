@@ -99,9 +99,10 @@ sub find_definition {
   return $node;
 }
 
-# Return a hash containing allowed child elements or attributes.
+# Return a hash containing allowed child elements, attributes, or attribute
+# values.
 #
-# Usage: find_properties <document> <node> element|attribute
+# Usage: find_properties <document> <node> element|attribute|value
 sub find_properties {
   # Get function arguments:
   my $document = shift || die 'Invalid number of arguments';
@@ -109,7 +110,7 @@ sub find_properties {
   my $type     = shift || die 'Invalid number of arguments';
 
   # Verify that the supplied type is supported:
-  die 'Invalid argument' unless ($type =~ /^(attribute|element)$/);
+  die 'Invalid argument' unless ($type =~ /^(attribute|element|value)$/);
 
   # Declare required variables:
   my %result = ();
@@ -136,9 +137,19 @@ sub find_properties {
       elsif ($type eq 'attribute') {
         # Get the name of the attribute:
         if (my $attribute_name = $node->getAttribute('name')) {
+          my @values = get_values($document, $node);
+
           # Add the attribute to the list:
-          $result{$attribute_name} = '';
+          $result{$attribute_name} = \@values;
         }
+      }
+      # Check if the node is a value:
+      elsif ($type eq 'value') {
+        # Get the actual value:
+        my $value = $node->to_literal;
+
+        # Add the value to the list:
+        $result{$value} = '';
       }
     }
     # Check whether the node is a relevant compositor:
@@ -161,6 +172,21 @@ sub find_properties {
 
   # Return the result:
   return %result;
+}
+
+# Return a list containing supported attribute values.
+#
+# Usage: get_values <document> <node>
+sub get_values {
+  # Get function arguments:
+  my $document = shift || die 'Invalid number of arguments';
+  my $node     = shift || die 'Invalid number of arguments';
+
+  # Find supported attribute values:
+  my %temporary = find_properties($document, $node, 'value');
+
+  # Return the result:
+  return keys %temporary;
 }
 
 # Return a hash containing supported attributes and their possible values.
