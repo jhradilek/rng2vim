@@ -80,6 +80,21 @@ sub display_version {
   print STDOUT NAME . " " . VERSION . "\n";
 }
 
+# Return a node with the definition of a named pattern:
+#
+# Usage: find_definition <document> <name>
+sub find_definition {
+  # Get function arguments:
+  my $document = shift || die 'Invalid number of arguments';
+  my $name     = shift || die 'Invalid number of arguments';
+
+  # Find the node with the definition of the given named pattern:
+  my ($node) = $document->findnodes("//*[name()='define' and \@name='$name']");
+
+  # Return the node:
+  return $node;
+}
+
 # Configure the option parser:
 Getopt::Long::Configure('no_auto_abbrev', 'no_ignore_case', 'bundling');
 
