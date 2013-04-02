@@ -163,6 +163,33 @@ sub find_properties {
   return %result;
 }
 
+# Return a hash containing supported attributes and their possible values.
+#
+# Usage: get_attributes <document> <node>
+sub get_attributes {
+  # Get function arguments:
+  my $document = shift || die 'Invalid number of arguments';
+  my $node     = shift || die 'Invalid number of arguments';
+
+  # Find allowed element attributes and return the result:
+  return find_properties($document, $node, 'attribute');
+}
+
+# Return a list containing allowed child elements.
+#
+# Usage: get_children <document> <node>
+sub get_children {
+  # Get function arguments:
+  my $document = shift || die 'Invalid number of arguments';
+  my $node     = shift || die 'Invalid number of arguments';
+
+  # Find allowed child elements:
+  my %temporary = find_properties($document, $node, 'element');
+
+  # Return the result:
+  return keys %temporary;
+}
+
 # Configure the option parser:
 Getopt::Long::Configure('no_auto_abbrev', 'no_ignore_case', 'bundling');
 
