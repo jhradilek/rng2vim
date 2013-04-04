@@ -341,6 +341,9 @@ sub rng_to_vim {
   my $schema = shift || die 'Invalid number of arguments';
   my $name   = shift || die 'Invalid number of arguments';
 
+  # Compose the output file name:
+  my $file   = "$name.vim";
+
   # Parse the XML schema:
   my $parser   = XML::LibXML->new(clean_namespaces => 1, no_defdtd => 1, expand_xinclude => 1);
   my $document = $parser->parse_file($schema);
@@ -349,22 +352,28 @@ sub rng_to_vim {
   my %elements = get_elements($document);
   my @root     = get_root_elements($document);
 
+  # Open the output file for writing:
+  unless (open(FOUT, ">$file")) {
+    # Report an error:
+    display_error("Unable to open the $file file for writing.", 13);
+  }
+
   # Print the XML data file header:
-  print "\" Vim XML data file\n";
-  print "\" Language:    $option_language\n"   if ($option_language);
-  print "\" Author:      $option_author\n"     if ($option_author);
-  print "\" Maintainer:  $option_maintainer\n" if ($option_maintainer);
-  print "\" URL:         $option_url\n"        if ($option_url);
-  print "\" Last Change: ", date_to_string(), "\n";
+  print FOUT "\" Vim XML data file\n";
+  print FOUT "\" Language:    $option_language\n"   if ($option_language);
+  print FOUT "\" Author:      $option_author\n"     if ($option_author);
+  print FOUT "\" Maintainer:  $option_maintainer\n" if ($option_maintainer);
+  print FOUT "\" URL:         $option_url\n"        if ($option_url);
+  print FOUT "\" Last Change: ", date_to_string(), "\n";
 
   # Print the XML data file start:
-  print "\nlet g:xmldata_$name = {\n";
+  print FOUT "\nlet g:xmldata_$name = {\n";
 
   # Print the list of entity references:
-  print "\\ 'vimxmlentities': [", join(', ', map { "'$_'" } ($option_xhtml_entities) ? XHMTL_ENTITIES : XML_ENTITIES), "],\n";
+  print FOUT "\\ 'vimxmlentities': [", join(', ', map { "'$_'" } ($option_xhtml_entities) ? XHMTL_ENTITIES : XML_ENTITIES), "],\n";
 
   # Print the list of root elements:
-  print "\\ 'vimxmlroot': [", join(', ', map { "'$_'" } sort @root ),"],\n";
+  print FOUT "\\ 'vimxmlroot': [", join(', ', map { "'$_'" } sort @root ),"],\n";
 
   # Print element definitions:
   while (my ($element, $property) = each %elements) {
@@ -373,14 +382,17 @@ sub rng_to_vim {
     my %attributes = %{$property->[1]};
 
     # Print the element definition:
-    print "\\ '$element': [\n";
-    print "\\ [", join(', ', map { "'$_'" } sort @children), "],\n";
-    print "\\ {", join(', ', map { "'$_': [" . join(', ', map { "'$_'" } sort @{$attributes{$_}}) . "]" } sort keys %attributes), "}\n";
-    print "\\ ],\n";
+    print FOUT "\\ '$element': [\n";
+    print FOUT "\\ [", join(', ', map { "'$_'" } sort @children), "],\n";
+    print FOUT "\\ {", join(', ', map { "'$_': [" . join(', ', map { "'$_'" } sort @{$attributes{$_}}) . "]" } sort keys %attributes), "}\n";
+    print FOUT "\\ ],\n";
   }
 
   # Print the XML data file end:
-  print "\\ }\n";
+  print FOUT "\\ }\n";
+
+  # Close the file:
+  close(FOUT);
 }
 
 # Configure the option parser:
