@@ -82,17 +82,6 @@ sub display_error {
   exit $exit_status;
 }
 
-# Display a warning message.
-#
-# Usage: display_warning <message>
-sub display_warning {
-  # Get function arguments:
-  my $warning_message = shift || die 'Invalid number of arguments';
-
-  # Display the warning:
-  print STDERR "$warning_message\n";
-}
-
 # Display usage information.
 #
 # Usage: display_usage
