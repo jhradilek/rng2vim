@@ -56,6 +56,7 @@ yacute Yacute yen yuml Yuml zeta Zeta zwj zwnj );
 
 # Command line options:
 our $option_xhtml_entities = 0;
+our $option_interactive    = 0;
 our $option_author         = '';
 our $option_language       = '';
 our $option_maintainer     = '';
@@ -108,6 +109,7 @@ Usage: $name [OPTION...] SCHEMA NAME
   -m, --maintainer NAME    specify the XML data file maintainer
   -u, --url URL            specify the XML data file URL
   -x, --xhtml-entities     use XHTML 1.0 character entity references
+  -i, --interactive        prompt before overwriting an existing file
   -h, --help               display usage information and exit
   -v, --version            display version information and exit
 END_USAGE
@@ -344,6 +346,15 @@ sub rng_to_vim {
   # Compose the output file name:
   my $file   = "$name.vim";
 
+  # When in interactive mode, check if the file already exists:
+  if ($option_interactive && -e $file) {
+    # Display the prompt:
+    print "Rewrite the file named `$file'? ";
+
+    # Terminate the script if the answer is not positive:
+    exit 0 unless (readline(*STDIN) =~ /^(y|yes)$/i);
+  }
+
   # Parse the XML schema:
   my $parser   = XML::LibXML->new(clean_namespaces => 1, no_defdtd => 1, expand_xinclude => 1);
   my $document = $parser->parse_file($schema);
@@ -403,6 +414,7 @@ GetOptions(
   'help|h'           => sub { display_usage();   exit 0;  },
   'version|v'        => sub { display_version(); exit 0;  },
   'xhtml-entities|x' => sub { $option_xhtml_entities = 1; },
+  'interactive|i'    => sub { $option_interactive    = 1; },
   'author|a=s'       => sub { $option_author         = $_[1]; },
   'language|l=s'     => sub { $option_language       = $_[1]; },
   'maintainer|m=s'   => sub { $option_maintainer     = $_[1]; },
