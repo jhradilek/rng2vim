@@ -25,17 +25,17 @@ For a detailed description of omni completion and an explanation of how to use i
 
 ## Examples
 
-To generate an XML data file named “relaxng10.vim” from a RELAX NG schema located online at http://relaxng.org/relaxng.rng, type the following at a shell prompt:
+To generate an XML data file named “docbook50.vim” from a DocBook 5.0 schema located online at http://www.docbook.org/xml/5.0/rng/docbook.rng, type the following at a shell prompt:
 
-    rng2vim http://relaxng.org/relaxng.rng relaxng10
+    rng2vim http://www.docbook.org/xml/5.0/rng/docbook.rng docbook50
 
 To generate this file from a RELAX NG schema stored in the current working directory, type:
 
-    rng2vim relaxng.rng relaxng10
+    rng2vim docbook.rng docbook50
 
-To generate an XML data file named “mallard10.vim” for the Mallard 1.0 markup language with support for all 253 character entity references that are documented in the XHMTL 1.0 specification, use the following command:
+To this XML data file with support for all 253 character entity references that are documented in the XHMTL 1.0 specification, use the following command:
 
-    rng2vim -x mallard-1.0.rng mallard10
+    rng2vim -x docbook.rng docbook50
 
 ## Copyright
 
