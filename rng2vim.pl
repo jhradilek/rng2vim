@@ -424,7 +424,11 @@ GetOptions(
 );
 
 # Verify the number of command line arguments:
-display_error("Invalid number of arguments.", 22) if (scalar(@ARGV) != 2);
+if (scalar(@ARGV) != 2) {
+  # Report an error:
+  display_error("Invalid number of arguments.\n" .
+                "Try \`" . NAME . " --help' for more information.", 22);
+}
 
 # Convert a RELAX NG schema to an XML data file for Vim:
 rng_to_vim($ARGV[0], $ARGV[1]);
