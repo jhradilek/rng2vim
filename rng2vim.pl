@@ -62,6 +62,9 @@ our $option_language       = '';
 our $option_maintainer     = '';
 our $option_url            = '';
 
+# A cache:
+our $cache                 = {};
+
 # Reconfigure the __WARN__ signal handler:
 $SIG{__WARN__} = sub {
   print STDERR NAME . ": " . (shift);
@@ -120,11 +123,21 @@ sub find_definition {
   my $document = shift || die 'Invalid number of arguments';
   my $name     = shift || die 'Invalid number of arguments';
 
-  # Find the node with the definition of the given named pattern:
-  my ($node) = $document->findnodes("//*[name()='define' and \@name='$name']");
+  # Check if the definition is already known:
+  if (my $node = $cache->{$name}) {
+    # Return the node:
+    return $node;
+  }
+  else {
+    # Find the node with the definition of the given named pattern:
+    my ($node) = $document->findnodes("//*[name()='define' and \@name='$name']");
 
-  # Return the node:
-  return $node;
+    # Add the node to the cache:
+    $cache->{$name} = $node;
+
+    # Return the node:
+    return $node;
+  }
 }
 
 # Return a hash containing allowed child elements, attributes, or attribute
