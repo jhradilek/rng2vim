@@ -23,7 +23,7 @@ INSTALL = /usr/bin/install -c
 POD2MAN = /usr/bin/pod2man
 SRCS    = rng2vim.pl
 MANS    = rng2vim.1
-DOCS    = AUTHORS COPYING README.markdown
+DOCS    = AUTHORS COPYING INSTALL.markdown README.markdown
 
 # Installation directories;  change these directories  to suite your needs:
 prefix  = /usr/local
@@ -48,6 +48,7 @@ install: $(SRCS) $(MANS) $(DOCS)
 	$(INSTALL) -d $(docdir)
 	$(INSTALL) -m 644 AUTHORS $(docdir)
 	$(INSTALL) -m 644 COPYING $(docdir)
+	$(INSTALL) -m 644 INSTALL.markdown $(docdir)
 	$(INSTALL) -m 644 README.markdown $(docdir)
 	-$(INSTALL) -m 644 ChangeLog $(docdir)
 
@@ -62,6 +63,7 @@ uninstall:
 	@echo "Removing documentation..."
 	-rm -f $(docdir)/AUTHORS
 	-rm -f $(docdir)/COPYING
+	-rm -f $(docdir)/INSTALL.markdown
 	-rm -f $(docdir)/README.markdown
 	-rm -f $(docdir)/ChangeLog
 	-rmdir $(docdir)
