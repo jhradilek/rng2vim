@@ -1,0 +1,89 @@
+=head1 NAME
+
+rng2vim - Convert a RELAX NG schema to an XML data file for Vim
+
+=head1 SYNOPSIS
+
+B<rng2vim> [B<-ix>] [B<-a> I<name>] [B<-l> I<language>] [B<-m> I<name>] [B<-u> I<url>] I<schema> I<name>
+
+B<rng2vim> B<-h>|B<-v>
+
+=head1 DESCRIPTION
+
+B<rng2vim> provides means to generate an XML data file for Vim's omni completion from a RELAX NG schema. It accepts a path or a link to the RELAX NG schema file and the name of the XML dialect as the command line arguments, and creates the corresponding XML data file in the current working directory.
+
+=head1 OPTIONS
+
+=over
+
+=item B<-a> I<name>, B<--author> I<name>
+
+Use I<name> as the name of the author in the XML data file header.
+
+=item B<-l> I<language>, B<--language> I<language>
+
+Use I<language> as the language in the XML data file header.
+
+=item B<-m> I<name>, B<--maintainer> I<name>
+
+Use I<name> as the name of the maintainer in the XML data file header.
+
+=item B<-u> I<url>, B<--url> I<url>
+
+Use I<url> as the URL in the XML data file header.
+
+=item B<-i>, B<--interactive>
+
+Prompt before overwriting an existing file.
+
+=item B<-x>, B<--xhtml-entities>
+
+Use character entity references documented in the XHTML 1.0 specification instead of those defined in the XML 1.1 standard.
+
+=item B<-h>, B<--help>
+
+Display usage information and immediately terminate the script.
+
+=item B<-v>, B<--version>
+
+Display version information and immediately terminate the script.
+
+=back
+
+=head1 EXAMPLES
+
+=over
+
+=item *
+
+To generate an XML data file named "docbook50.vim" from a DocBook 5.0 schema located online at <http://www.docbook.org/xml/5.0/rng/docbook.rng>, type the following at a shell prompt:
+
+  rng2vim http://www.docbook.org/xml/5.0/rng/docbook.rng docbook50
+
+=item *
+
+To generate an XML data file from a RELAX NG schema stored in the current working directory, type:
+
+  rng2vim docbook.rng docbook50
+
+=item *
+
+To generate an XML data file with support for all 253 character entity references that are documented in the XHMTL 1.0 specification, use the following command:
+
+  rng2vim -x docbook.rng docbook50
+
+=back
+
+=head1 SEE ALSO
+
+B<vim>(1)
+
+=head1 BUGS
+
+To report bugs or to submit patches, please, create a new issue at <https://github.com/jhradilek/rng2vim/issues/>.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2013 Jaromir Hradilek
+
+This program is free software; see the source for copying conditions. It is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
