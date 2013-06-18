@@ -20,25 +20,30 @@ VERSION = 0.1.0
 # General settings; change the shell or the path to the install executable:
 SHELL   = /bin/sh
 INSTALL = /usr/bin/install -c
+POD2MAN = /usr/bin/pod2man
 SRCS    = rng2vim.pl
+MANS    = rng2vim.1
 DOCS    = AUTHORS COPYING README.markdown
 
 # Installation directories;  change these directories  to suite your needs:
 prefix  = /usr/local
 bindir  = $(prefix)/bin
+mandir  = $(prefix)/share/man/man1
 docdir  = $(prefix)/share/doc/$(NAME)-$(VERSION)
 
 # The following are the make rules;  please, do not edit these rules unless
 # you really know what you are doing:
 .PHONY: all
-all:
-	@echo "Nothing to do. To install this program, type \`make install'."
+all: $(MANS)
 
 .PHONY: install
-install: $(SRCS) $(DOCS)
+install: $(SRCS) $(MANS) $(DOCS)
 	@echo "Copying executables..."
 	$(INSTALL) -d $(bindir)
 	$(INSTALL) -m 755 rng2vim.pl $(bindir)/rng2vim
+	@echo "Copying manual pages..."
+	$(INSTALL) -d $(mandir)
+	$(INSTALL) -m 644 rng2vim.1 $(mandir)
 	@echo "Copying documentation..."
 	$(INSTALL) -d $(docdir)
 	$(INSTALL) -m 644 AUTHORS $(docdir)
@@ -51,10 +56,20 @@ uninstall:
 	@echo "Removing executables..."
 	-rm -f $(bindir)/rng2vim
 	-rmdir $(bindir)
+	@echo "Removing manual pages..."
+	-rm -f $(mandir)/rng2vim.1
+	-rmdir $(mandir)
 	@echo "Removing documentation..."
 	-rm -f $(docdir)/AUTHORS
 	-rm -f $(docdir)/COPYING
 	-rm -f $(docdir)/README.markdown
 	-rm -f $(docdir)/ChangeLog
 	-rmdir $(docdir)
+
+.PHONY: clean
+clean:
+	-rm -f $(MANS)
+
+%.1: %.pod
+	$(POD2MAN) --section=1 --release="$(VERSION)" $^ $@
 
