@@ -33,7 +33,7 @@ To generate this file from a RELAX NG schema stored in the current working direc
 
     rng2vim docbook.rng docbook50
 
-To this XML data file with support for all 253 character entity references that are documented in the XHMTL 1.0 specification, use the following command:
+To generate this XML data file with support for all 253 character entity references that are documented in the XHMTL 1.0 specification, use the following command:
 
     rng2vim -x docbook.rng docbook50
 
