@@ -316,7 +316,7 @@ sub get_root_elements {
   my $document = shift || die 'Invalid number of arguments';
 
   # Find the node with root element definitions:
-  my ($node) = $document->findnodes("/*[name()='grammar']/*[name()='start']");
+  my ($node) = $document->findnodes("/*[name()='grammar']//*[name()='start']");
 
   # Find supported root elements:
   my @elements = get_children($document, $node);
