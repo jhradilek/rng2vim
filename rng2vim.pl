@@ -128,16 +128,15 @@ sub find_definition {
     # Return the node:
     return $node;
   }
-  else {
-    # Find the node with the definition of the given named pattern:
-    my ($node) = $document->findnodes("//*[name()='define' and \@name='$name']");
 
-    # Add the node to the cache:
-    $cache->{$name} = $node;
+  # Find the node with the definition of the given named pattern:
+  my ($node) = $document->findnodes("//*[name()='define' and \@name='$name']");
 
-    # Return the node:
-    return $node;
-  }
+  # Add the node to the cache:
+  $cache->{$name} = $node;
+
+  # Return the node:
+  return $node;
 }
 
 # Return a hash containing allowed child elements, attributes, or attribute
