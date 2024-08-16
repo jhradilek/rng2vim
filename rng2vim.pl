@@ -115,28 +115,28 @@ sub display_version {
   print STDOUT NAME . " " . VERSION . "\n";
 }
 
-# Return a node with the definition of a named pattern:
+# Return all nodes with the definition of the named pattern:
 #
-# Usage: find_definition <document> <name>
-sub find_definition {
+# Usage: find_definitions <document> <name>
+sub find_definitions {
   # Get function arguments:
   my $document = shift || die 'Invalid number of arguments';
   my $name     = shift || die 'Invalid number of arguments';
 
   # Check if the definition is already known:
-  if (my $node = $cache->{$name}) {
+  if (my $nodes = $cache->{$name}) {
     # Return the node:
-    return $node;
+    return @{$nodes};
   }
 
   # Find the node with the definition of the given named pattern:
-  my ($node) = $document->findnodes("//*[name()='define' and \@name='$name']");
+  my @nodes = $document->findnodes("//*[name()='define' and \@name='$name']");
 
-  # Add the node to the cache:
-  $cache->{$name} = $node;
+  # Add the nodes to the cache:
+  $cache->{$name} = \@nodes;
 
   # Return the node:
-  return $node;
+  return @nodes;
 }
 
 # Return a hash containing allowed child elements, attributes, or attribute
@@ -202,11 +202,11 @@ sub find_properties {
       # Get the name of the referenced name pattern:
       my $reference_name = $node->getAttribute('name');
 
-      # Locate the definition of the referenced name pattern:
-      my $reference_target = find_definition($document, $reference_name);
-
-      # Add child nodes to the queue:
-      push(@queue, $reference_target->childNodes);
+      # Locate the definitions of the referenced name pattern:
+      foreach my $reference_target (find_definitions($document, $reference_name)) {
+        # Add child nodes to the queue:
+        push(@queue, $reference_target->childNodes);
+      }
     }
   }
 
